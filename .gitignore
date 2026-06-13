@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+*.env
+build/
+coverage/
+backend/.env
+frontend/.env
