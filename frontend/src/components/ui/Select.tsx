@@ -2,6 +2,7 @@ import React from 'react';
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   error?: boolean;
+  placeholder?: string;
   options: { label: string; value: string | number }[];
 }
 
