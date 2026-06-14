@@ -52,3 +52,25 @@ export const markAsRead = async (req: Request, res: Response) => {
     return errorResponse(res, 500, 'Internal server error');
   }
 };
+
+// PATCH /notifications/read-all
+export const markAllAsRead = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return errorResponse(res, 401, 'Unauthorized');
+
+    await Notification.updateMany(
+      { userId, isRead: false },
+      { isRead: true }
+    );
+
+    return res.status(200).json({
+      data: { success: true },
+      meta: getMeta(req),
+      error: null,
+    });
+  } catch (e) {
+    console.error('markAllAsRead error:', e);
+    return errorResponse(res, 500, 'Internal server error');
+  }
+};

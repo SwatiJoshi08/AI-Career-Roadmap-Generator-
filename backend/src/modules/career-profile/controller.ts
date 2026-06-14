@@ -66,13 +66,6 @@ export const updateProfile = async (req: Request, res: Response) => {
       return errorResponse(res, 400, 'Validation Error', parsed.error.errors);
     }
 
-    const profileId = req.params.id;
-    // Ownership check via service since service uses findByUserId
-    const existingProfile = await CareerProfileService.getProfile(userId);
-    if (!existingProfile || existingProfile._id.toString() !== profileId) {
-       return errorResponse(res, 403, 'You do not have permission to update this profile');
-    }
-
     const meta = getMeta(req);
     const result = await CareerProfileService.updateProfile(userId, parsed.data, meta);
 

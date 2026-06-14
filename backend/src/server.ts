@@ -3,7 +3,7 @@ import { config } from './config/env';
 import { connectDB } from './config/db';
 import { redis } from './config/redis';
 import mongoose from 'mongoose';
-
+import './jobs/gapAnalysisWorker';
 const startServer = async () => {
   try {
     // Connect to database
