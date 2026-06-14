@@ -6,6 +6,16 @@ import rateLimit from 'express-rate-limit';
 import { config } from './config/env';
 import { errorResponse } from './common/response';
 import { AppError } from './common/errors';
+import authRoutes from './modules/auth/routes';
+import careerProfileRoutes from './modules/career-profile/routes';
+import careerGoalRoutes from './modules/goal-selection/routes';
+import skillRoutes from './modules/skill-inventory/routes';
+import gapAnalysisRoutes from './modules/gap-analysis/routes';
+import roadmapRoutes from './modules/roadmap-builder/routes';
+import progressRoutes from './modules/progress-tracking/routes';
+import mentorRoutes from './modules/mentor-review/routes';
+import notificationRoutes from './modules/notifications/routes';
+import dashboardRoutes from './modules/admin/routes';
 
 const app = express();
 
@@ -26,9 +36,9 @@ if (config.NODE_ENV !== 'test') {
 // Parse Body Middleware
 app.use(express.json());
 
-// Rate Limiting on authentication routes: 10 requests per 15 minutes per IP
+// Rate Limiting on authentication routes
 const authRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
@@ -41,22 +51,32 @@ const authRateLimiter = rateLimit({
 });
 
 app.use('/api/v1/acrg/auth', authRateLimiter);
+app.use('/api/v1/acrg/auth', authRoutes);
+app.use('/api/v1/acrg', skillRoutes);
+app.use('/api/v1/acrg', gapAnalysisRoutes);
+app.use('/api/v1/acrg', roadmapRoutes);
+app.use('/api/v1/acrg', progressRoutes);
+app.use('/api/v1/acrg', mentorRoutes);
+app.use('/api/v1/acrg', notificationRoutes);
+app.use('/api/v1/acrg', dashboardRoutes);
+// ✅ Career Profile Routes
+app.use('/api/v1/acrg', careerProfileRoutes);
+// ✅ Career Goal Routes (now after specific routes)
+app.use('/api/v1/acrg', careerGoalRoutes);
 
-// Simple Healthcheck Route
+
+// Health Check
 app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
 });
 
-// Global Error Handler Middleware
+// Global Error Handler
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  // If it's a known application error, format and return it
   if (err instanceof AppError) {
     return res.status(err.statusCode).json(
       errorResponse(err.code, err.message, err.details)
     );
   }
-
-  // Otherwise log the unexpected error and return 500
   console.error('[Unhandled Exception]:', err);
   return res.status(500).json(
     errorResponse('INTERNAL_SERVER_ERROR', 'An unexpected error occurred')
