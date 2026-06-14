@@ -3,4 +3,11 @@ import { redis } from '../config/redis';
 
 export const gapAnalysisQueue = new Queue('gap-analysis-queue', {
   connection: redis as any,
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: {
+      type: 'exponential',
+      delay: 5000,
+    },
+  },
 });

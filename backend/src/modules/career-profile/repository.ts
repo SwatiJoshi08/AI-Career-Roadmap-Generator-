@@ -11,15 +11,13 @@ export const CareerProfileRepository = {
   },
 
   async updateProfile(userId: string, data: Partial<ICareerProfile>): Promise<ICareerProfile | null> {
-    // using findOne + save to trigger mongoose hooks/version bumps
-    const profile = await CareerProfile.findOne({ userId });
-    if (!profile) return null;
-
-    profile.set(data);
-    
-    // Explicitly handle version bump
-    profile.version = (profile.version || 0) + 1;
-
-    return profile.save();
+    return CareerProfile.findOneAndUpdate(
+      { userId },
+      { 
+        $set: data,
+        $inc: { version: 1 }
+      },
+      { new: true, runValidators: true }
+    );
   }
 };

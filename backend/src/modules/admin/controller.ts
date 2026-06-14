@@ -5,6 +5,8 @@ import { Roadmap } from '../../database/models/Roadmap';
 import { Skill } from '../../database/models/Skill';
 import { Notification } from '../../database/models/Notification';
 import { RoadmapMilestone } from '../../database/models/RoadmapMilestone';
+import { CareerGoal } from '../../database/models/CareerGoal';
+import { AnalyticsEvent } from '../../database/models/AnalyticsEvent';
 
 const getMeta = (req: Request) => ({
   requestId: (req.headers['x-request-id'] as string) || crypto.randomUUID(),
@@ -54,15 +56,29 @@ export const searchRecords = async (req: Request, res: Response) => {
       return errorResponse(res, 400, 'Query parameter "q" is required');
     }
 
-    // Search across skills by text index
-    const skills = await Skill.find({
-      userId,
-      deletedAt: null,
-      $text: { $search: q },
-    }).limit(20);
+    // Search across skills, goals, and roadmaps
+    // $regex is used for basic substring matching as fallback or if text indexes are not fully set up.
+    const [skills, goals, roadmaps] = await Promise.all([
+      Skill.find({
+        userId,
+        deletedAt: null,
+        name: { $regex: q, $options: 'i' },
+      }).limit(20),
+      CareerGoal.find({
+        userId,
+        $or: [
+          { title: { $regex: q, $options: 'i' } },
+          { targetRole: { $regex: q, $options: 'i' } }
+        ]
+      }).limit(20),
+      Roadmap.find({
+        userId,
+        title: { $regex: q, $options: 'i' },
+      }).limit(20)
+    ]);
 
     return res.status(200).json({
-      data: { skills },
+      data: { skills, goals, roadmaps },
       meta: getMeta(req),
       error: null,
     });
@@ -90,11 +106,37 @@ export const getAuditEvents = async (req: Request, res: Response) => {
 
 /* GET /admin/analytics/summary */
 export const getAnalyticsSummary = async (req: Request, res: Response) => {
-  void req;
   try {
-    // TODO: compute analytics summary (requires admin role)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const [last7daysRaw, last30daysRaw] = await Promise.all([
+      AnalyticsEvent.aggregate([
+        { $match: { timestamp: { $gte: sevenDaysAgo } } },
+        { $group: { _id: "$eventName", count: { $sum: 1 } } }
+      ]),
+      AnalyticsEvent.aggregate([
+        { $match: { timestamp: { $gte: thirtyDaysAgo } } },
+        { $group: { _id: "$eventName", count: { $sum: 1 } } }
+      ])
+    ]);
+
+    const formatData = (rawData: any[]) => {
+      const formatted: Record<string, number> = {};
+      rawData.forEach(item => {
+        formatted[item._id] = item.count;
+      });
+      return formatted;
+    };
+
     return res.status(200).json({
-      data: null,
+      data: {
+        last7days: formatData(last7daysRaw),
+        last30days: formatData(last30daysRaw)
+      },
       meta: getMeta(req),
       error: null,
     });

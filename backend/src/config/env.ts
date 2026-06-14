@@ -30,10 +30,10 @@ const envSchema = z.object({
   CLOUDINARY_API_SECRET: z.string({
     required_error: 'CLOUDINARY_API_SECRET is required',
   }),
-  ANTHROPIC_API_KEY: z.string({
-    required_error: 'ANTHROPIC_API_KEY is required',
+  GEMINI_API_KEY: z.string({
+    required_error: 'GEMINI_API_KEY is required',
   }),
-  AI_MODEL: z.string().default('claude-3-5-sonnet-20241022'),
+  AI_MODEL: z.string().default('gemini-1.5-pro'),
   APP_ORIGIN: z.string({
     required_error: 'APP_ORIGIN is required',
   }),
