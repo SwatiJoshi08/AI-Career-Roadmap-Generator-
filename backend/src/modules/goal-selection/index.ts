@@ -1,2 +1,1 @@
-// goal-selection module placeholder
-export {};
+export { default as careerGoalRoutes } from './routes';

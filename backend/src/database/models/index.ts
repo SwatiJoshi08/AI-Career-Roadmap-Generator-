@@ -1,2 +1,15 @@
-// Database models exports placeholder
-export {};
+export * from './enums';
+export * from './baseSchema';
+export * from './User';
+export * from './CareerProfile';
+export * from './CareerGoal';
+export * from './Skill';
+export * from './SkillEvidence';
+export * from './GapAnalysis';
+export * from './Roadmap';
+export * from './RoadmapMilestone';
+export * from './ProgressUpdate';
+export * from './MentorComment';
+export * from './Notification';
+export * from './AuditLog';
+export * from './AnalyticsEvent';

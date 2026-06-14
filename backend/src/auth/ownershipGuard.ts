@@ -1,19 +1,36 @@
-import { Response, NextFunction } from 'express';
-import { AuthenticatedRequest } from './authMiddleware';
-import { ForbiddenError } from '../common/errors';
+import { Request, Response, NextFunction } from 'express';
+import { errorResponse } from '../utils/errorResponse';
+import mongoose from 'mongoose';
 
-export const ownershipGuard = (paramName: string = 'userId') => {
-  return (req: AuthenticatedRequest, _res: Response, next: NextFunction) => {
+/**
+ * Factory function to create an ownership guard middleware.
+ * @param model Mongoose model to check
+ * @param paramName the param name in req.params containing the document ID
+ */
+export const ownershipGuard = (model: mongoose.Model<any>, paramName: string = 'id') => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return next(new ForbiddenError('Authentication required'));
+      return errorResponse(res, 401, 'Unauthorized: User not authenticated');
     }
 
-    const targetUserId = req.params[paramName] || req.body[paramName];
-    
-    // Admin role bypasses ownership checks. Standard users must match their user ID.
-    if (req.user.role !== 'admin' && req.user.id !== targetUserId) {
-      return next(new ForbiddenError('You do not own this resource'));
+    const docId = req.params[paramName];
+    if (!docId) {
+      return errorResponse(res, 400, `Bad Request: Missing parameter ${paramName}`);
     }
-    next();
+
+    try {
+      const doc = await model.findById(docId);
+      if (!doc) {
+        return errorResponse(res, 404, 'Not Found: Document not found');
+      }
+
+      if (doc.createdBy?.toString() !== req.user.userId) {
+        return errorResponse(res, 403, 'Forbidden: You do not own this document');
+      }
+
+      return next();
+    } catch (error) {
+      return errorResponse(res, 500, 'Internal Server Error while checking ownership');
+    }
   };
 };

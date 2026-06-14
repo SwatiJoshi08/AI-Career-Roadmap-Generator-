@@ -1,2 +1,1 @@
-// career-profile module placeholder
-export {};
+export { default as careerProfileRoutes } from './routes';
