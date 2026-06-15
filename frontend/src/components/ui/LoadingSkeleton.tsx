@@ -1,23 +1,13 @@
 import React from 'react';
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export interface LoadingSkeletonProps {
   className?: string;
-  variant?: 'text' | 'circular' | 'rectangular';
 }
 
-export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
-  className = '',
-  variant = 'rectangular',
-}) => {
-  const baseStyle = 'animate-pulse bg-slate-200';
-  
-  const variants = {
-    text: 'h-4 w-3/4 rounded',
-    circular: 'rounded-full',
-    rectangular: 'rounded-lg',
-  };
-
+export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({ className }) => {
   return (
-    <div className={`${baseStyle} ${variants[variant]} ${className}`} />
+    <div className={twMerge(clsx('animate-pulse bg-gray-200 rounded-md', className))} />
   );
 };

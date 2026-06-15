@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { createProfileSchema, updateProfileSchema } from './schema';
 import { CareerProfileService } from './service';
 import { errorResponse } from '../../utils/errorResponse';
+import { stripHtml } from '../../common/sanitize';
 
 const getMeta = (req: Request) => ({
   requestId: (req.headers['x-request-id'] as string) || crypto.randomUUID(),
@@ -38,8 +39,16 @@ export const createProfile = async (req: Request, res: Response) => {
       return errorResponse(res, 400, 'Validation Error', parsed.error.errors);
     }
 
+    const sanitizedData = {
+      currentRole: parsed.data.currentRole ? stripHtml(parsed.data.currentRole) : undefined,
+      targetRole: parsed.data.targetRole ? stripHtml(parsed.data.targetRole) : undefined,
+      yearsOfExperience: parsed.data.yearsOfExperience,
+      educationLevel: parsed.data.educationLevel,
+      bio: parsed.data.bio ? stripHtml(parsed.data.bio) : undefined,
+    };
+
     const meta = getMeta(req);
-    const result = await CareerProfileService.createProfile(userId, parsed.data, meta);
+    const result = await CareerProfileService.createProfile(userId, sanitizedData, meta);
 
     if (result.error) {
       return errorResponse(res, result.code, result.error);
@@ -66,8 +75,16 @@ export const updateProfile = async (req: Request, res: Response) => {
       return errorResponse(res, 400, 'Validation Error', parsed.error.errors);
     }
 
+    const sanitizedData = {
+      currentRole: parsed.data.currentRole ? stripHtml(parsed.data.currentRole) : undefined,
+      targetRole: parsed.data.targetRole ? stripHtml(parsed.data.targetRole) : undefined,
+      yearsOfExperience: parsed.data.yearsOfExperience,
+      educationLevel: parsed.data.educationLevel,
+      bio: parsed.data.bio ? stripHtml(parsed.data.bio) : undefined,
+    };
+
     const meta = getMeta(req);
-    const result = await CareerProfileService.updateProfile(userId, parsed.data, meta);
+    const result = await CareerProfileService.updateProfile(userId, sanitizedData, meta);
 
     if (result.error) {
       return errorResponse(res, result.code, result.error);

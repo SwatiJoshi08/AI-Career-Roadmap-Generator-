@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { createGoalSchema, updateGoalSchema } from './schema';
 import { CareerGoalService } from './service';
 import { errorResponse } from '../../utils/errorResponse';
+import { stripHtml } from '../../common/sanitize';
 
 const getMeta = (req: Request) => ({
   requestId: (req.headers['x-request-id'] as string) || crypto.randomUUID(),
@@ -66,8 +67,16 @@ export const createGoal = async (req: Request, res: Response) => {
       return errorResponse(res, 400, 'Validation Error', parsed.error.errors);
     }
 
+    const sanitizedData = {
+      title: stripHtml(parsed.data.title),
+      description: parsed.data.description ? stripHtml(parsed.data.description) : undefined,
+      targetDate: parsed.data.targetDate,
+      priority: parsed.data.priority,
+      goalType: parsed.data.goalType ? stripHtml(parsed.data.goalType) : undefined,
+    };
+
     const meta = getMeta(req);
-    const result = await CareerGoalService.createGoal(userId, parsed.data, meta);
+    const result = await CareerGoalService.createGoal(userId, sanitizedData, meta);
 
     if (result.error) {
       return errorResponse(res, result.code, result.error);
@@ -94,8 +103,17 @@ export const updateGoal = async (req: Request, res: Response) => {
       return errorResponse(res, 400, 'Validation Error', parsed.error.errors);
     }
 
+    const sanitizedData = {
+      title: parsed.data.title ? stripHtml(parsed.data.title) : undefined,
+      description: parsed.data.description ? stripHtml(parsed.data.description) : undefined,
+      targetDate: parsed.data.targetDate,
+      priority: parsed.data.priority,
+      goalType: parsed.data.goalType ? stripHtml(parsed.data.goalType) : undefined,
+      status: parsed.data.status ? stripHtml(parsed.data.status) : undefined,
+    };
+
     const meta = getMeta(req);
-    const result = await CareerGoalService.updateGoal(userId, req.params.id, parsed.data, meta);
+    const result = await CareerGoalService.updateGoal(userId, req.params.id, sanitizedData, meta);
 
     if (result.error) {
       return errorResponse(res, result.code, result.error);

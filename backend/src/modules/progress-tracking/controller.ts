@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { errorResponse } from '../../utils/errorResponse';
 import { ProgressUpdate } from '../../database/models/ProgressUpdate';
+import { stripHtml } from '../../common/sanitize';
 
 const getMeta = (req: Request) => ({
   requestId: (req.headers['x-request-id'] as string) || crypto.randomUUID(),
@@ -14,7 +15,13 @@ export const createProgress = async (req: Request, res: Response) => {
     const userId = req.user?.userId;
     if (!userId) return errorResponse(res, 401, 'Unauthorized');
 
-    const progressData = { ...req.body, userId, createdBy: userId };
+    const progressData = { 
+      ...req.body, 
+      note: req.body.note ? stripHtml(req.body.note) : undefined,
+      evidenceUrl: req.body.evidenceUrl ? stripHtml(req.body.evidenceUrl) : undefined,
+      userId, 
+      createdBy: userId 
+    };
     const progress = await ProgressUpdate.create(progressData);
 
     return res.status(201).json({

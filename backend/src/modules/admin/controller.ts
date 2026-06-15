@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
+import mongoose from 'mongoose';
 import { errorResponse } from '../../utils/errorResponse';
 import { Roadmap } from '../../database/models/Roadmap';
 import { Skill } from '../../database/models/Skill';
@@ -19,18 +20,28 @@ export const getDashboard = async (req: Request, res: Response) => {
     const userId = req.user?.userId;
     if (!userId) return errorResponse(res, 401, 'Unauthorized');
 
-    // Fetch all user roadmap IDs first (for milestone query)
-    const userRoadmaps = await Roadmap.find({ userId }).select('_id');
-    const roadmapIds = userRoadmaps.map((r) => r._id);
+    const roadmaps = await Roadmap.find({ 
+      userId: new mongoose.Types.ObjectId(userId),
+      deletedAt: null 
+    });
+    const roadmapIds = roadmaps.map(r => r._id);
 
     const [activeRoadmaps, skillCount, unreadNotifications, pendingMilestones] =
       await Promise.all([
-        Roadmap.countDocuments({ userId, status: 'active' }),
-        Skill.countDocuments({ userId, deletedAt: null }),
+        Roadmap.countDocuments({ 
+          userId: new mongoose.Types.ObjectId(userId),
+          status: 'active',
+          deletedAt: null 
+        }),
+        Skill.countDocuments({ 
+          userId: new mongoose.Types.ObjectId(userId),
+          deletedAt: null 
+        }),
         Notification.countDocuments({ userId, isRead: false }),
         RoadmapMilestone.countDocuments({
           roadmapId: { $in: roadmapIds },
           completedAt: null,
+          deletedAt: null
         }),
       ]);
 

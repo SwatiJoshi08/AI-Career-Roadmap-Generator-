@@ -50,6 +50,13 @@ const authRateLimiter = rateLimit({
   },
 });
 
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests'
+});
+app.use('/api/', generalLimiter);
+
 app.use('/api/v1/acrg/auth', authRateLimiter);
 app.use('/api/v1/acrg/auth', authRoutes);
 app.use('/api/v1/acrg', skillRoutes);
