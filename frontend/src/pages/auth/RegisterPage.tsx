@@ -23,11 +23,22 @@ const registerSchema = z.object({
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
+const getErrorMessage = (err: any, fallback: string) => {
+  const message =
+    err?.response?.data?.error?.message ||
+    err?.error?.message ||
+    err?.message?.message ||
+    err?.message ||
+    fallback;
+
+  return typeof message === 'string' ? message : fallback;
+};
+
 export const RegisterPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [globalError, setGlobalError] = useState<string | null>(null);
+  const [globalError, setGlobalError] = useState<string>('');
 
   const {
     register,
@@ -41,7 +52,7 @@ export const RegisterPage: React.FC = () => {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    setGlobalError(null);
+    setGlobalError('');
     try {
       // Omit confirmPassword
       const { confirmPassword, ...payload } = data;
@@ -55,7 +66,7 @@ export const RegisterPage: React.FC = () => {
         setGlobalError('Invalid response from server');
       }
     } catch (err: any) {
-      setGlobalError(err.message || 'Registration failed');
+      setGlobalError(getErrorMessage(err, 'Registration failed. Please try again.'));
     }
   };
 

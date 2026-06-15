@@ -40,7 +40,7 @@ export const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Active Roadmaps" value={stats.activeRoadmaps ?? 0} icon={Map} color="blue" />
         <StatCard title="Pending Milestones" value={stats.pendingMilestones ?? 0} icon={Target} color="yellow" />
-        <StatCard title="Skills Added" value={stats.skillsAdded ?? 0} icon={BookOpen} color="green" />
+        <StatCard title="Skills Added" value={stats.skillsAdded ?? stats.skillCount ?? 0} icon={BookOpen} color="green" />
         <StatCard title="Unread Notifications" value={stats.unreadNotifications ?? 0} icon={Bell} color="red" />
       </div>
     </div>

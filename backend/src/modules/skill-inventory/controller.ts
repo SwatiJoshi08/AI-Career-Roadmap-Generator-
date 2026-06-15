@@ -87,6 +87,10 @@ export const addEvidence = async (req: Request, res: Response) => {
     const sanitizedData = {
       evidenceType: parsed.data.evidenceType ? stripHtml(parsed.data.evidenceType) : undefined,
       evidenceUrl: parsed.data.evidenceUrl ? stripHtml(parsed.data.evidenceUrl) : undefined,
+      fileName: parsed.data.fileName ? stripHtml(parsed.data.fileName) : undefined,
+      publicId: parsed.data.publicId ? stripHtml(parsed.data.publicId) : undefined,
+      resourceType: parsed.data.resourceType ? stripHtml(parsed.data.resourceType) : undefined,
+      fileSize: parsed.data.fileSize,
       description: parsed.data.description ? stripHtml(parsed.data.description) : undefined,
       verifiedAt: parsed.data.verifiedAt
     };

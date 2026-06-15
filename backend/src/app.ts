@@ -16,6 +16,7 @@ import progressRoutes from './modules/progress-tracking/routes';
 import mentorRoutes from './modules/mentor-review/routes';
 import notificationRoutes from './modules/notifications/routes';
 import dashboardRoutes from './modules/admin/routes';
+import uploadRoutes from './modules/upload/routes';
 
 const app = express();
 
@@ -66,6 +67,7 @@ app.use('/api/v1/acrg', progressRoutes);
 app.use('/api/v1/acrg', mentorRoutes);
 app.use('/api/v1/acrg', notificationRoutes);
 app.use('/api/v1/acrg', dashboardRoutes);
+app.use('/api/v1/acrg', uploadRoutes);
 // ✅ Career Profile Routes
 app.use('/api/v1/acrg', careerProfileRoutes);
 // ✅ Career Goal Routes (now after specific routes)

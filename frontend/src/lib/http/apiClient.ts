@@ -33,10 +33,17 @@ apiClient.interceptors.response.use(
       window.location.href = '/login';
     }
 
+    const rawError = (error.response?.data as any)?.error;
+    const message =
+      rawError?.message ||
+      (typeof rawError === 'string' ? rawError : undefined) ||
+      error.message ||
+      'An unexpected error occurred';
+
     const errorPayload = {
       code: error.response?.status || 500,
-      message: (error.response?.data as any)?.error || error.message || 'An unexpected error occurred',
-      details: (error.response?.data as any)?.details || null,
+      message,
+      details: rawError?.details || (error.response?.data as any)?.details || null,
     };
 
     return Promise.reject(errorPayload);
