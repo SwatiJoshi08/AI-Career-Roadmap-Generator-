@@ -27,6 +27,10 @@ export const updateSkillSchema = z.object({
 export const addEvidenceSchema = z.object({
   evidenceType: z.string().optional(),
   evidenceUrl: z.string().url().optional(),
+  fileName: z.string().optional(),
+  publicId: z.string().optional(),
+  resourceType: z.string().optional(),
+  fileSize: z.number().nonnegative().optional(),
   description: z.string().max(500).optional(),
   verifiedAt: z.string().datetime().optional(),
 });

@@ -17,11 +17,22 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+const getErrorMessage = (err: any, fallback: string) => {
+  const message =
+    err?.response?.data?.error?.message ||
+    err?.error?.message ||
+    err?.message?.message ||
+    err?.message ||
+    fallback;
+
+  return typeof message === 'string' ? message : fallback;
+};
+
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [globalError, setGlobalError] = useState<string | null>(null);
+  const [globalError, setGlobalError] = useState<string>('');
 
   const {
     register,
@@ -32,7 +43,7 @@ export const LoginPage: React.FC = () => {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setGlobalError(null);
+    setGlobalError('');
     try {
       const response = await authApi.login(data);
       if (response.data) {
@@ -45,7 +56,7 @@ export const LoginPage: React.FC = () => {
       if (err.code === 401) {
         setGlobalError('Invalid email or password');
       } else {
-        setGlobalError(err.message || 'Login failed');
+        setGlobalError(getErrorMessage(err, 'Login failed. Please try again.'));
       }
     }
   };

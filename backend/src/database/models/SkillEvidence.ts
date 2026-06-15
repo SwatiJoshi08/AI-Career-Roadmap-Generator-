@@ -6,6 +6,10 @@ export interface ISkillEvidence extends IBaseDocument {
   userId: Types.ObjectId;
   evidenceType?: string;
   evidenceUrl?: string;
+  fileName?: string;
+  publicId?: string;
+  resourceType?: string;
+  fileSize?: number;
   description?: string;
   verifiedAt?: Date;
 }
@@ -17,6 +21,10 @@ const skillEvidenceSchema = new Schema<ISkillEvidence>(
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     evidenceType: { type: String },
     evidenceUrl: { type: String },
+    fileName: { type: String },
+    publicId: { type: String },
+    resourceType: { type: String },
+    fileSize: { type: Number },
     description: { type: String },
     verifiedAt: { type: Date },
   },

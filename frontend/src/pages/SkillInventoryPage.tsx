@@ -12,6 +12,7 @@ import { Modal } from '../components/ui/Modal';
 import { EmptyState } from '../components/ui/EmptyState';
 import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
 import { ErrorAlert } from '../components/ui/ErrorAlert';
+import { FileUploader, type UploadedFileResult } from '../components/ui/FileUploader';
 import { useToast } from '../lib/ToastContext';
 import { BookOpen, Plus, FileText } from 'lucide-react';
 
@@ -23,7 +24,6 @@ const skillSchema = z.object({
 
 const evidenceSchema = z.object({
   evidenceType: z.string().optional(),
-  evidenceUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   description: z.string().optional(),
 });
 
@@ -37,6 +37,8 @@ export const SkillInventoryPage: React.FC = () => {
   const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
   const [isEvidenceModalOpen, setIsEvidenceModalOpen] = useState(false);
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
+  const [evidenceStep, setEvidenceStep] = useState(1);
+  const [uploadedEvidence, setUploadedEvidence] = useState<UploadedFileResult | null>(null);
 
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -78,12 +80,21 @@ export const SkillInventoryPage: React.FC = () => {
   };
 
   const onAddEvidence = async (data: EvidenceFormData) => {
-    if (!selectedSkillId) return;
+    if (!selectedSkillId || !uploadedEvidence) return;
     try {
-      await skillsApi.addEvidence(selectedSkillId, data);
+      await skillsApi.addEvidence(selectedSkillId, {
+        ...data,
+        evidenceUrl: uploadedEvidence.secureUrl,
+        fileName: uploadedEvidence.fileName,
+        publicId: uploadedEvidence.publicId,
+        resourceType: uploadedEvidence.resourceType,
+        fileSize: uploadedEvidence.fileSize,
+      });
       showToast('Evidence added successfully', 'success');
       setIsEvidenceModalOpen(false);
       resetEvidence();
+      setUploadedEvidence(null);
+      setEvidenceStep(1);
       queryClient.invalidateQueries({ queryKey: ['skills'] });
     } catch (err: any) {
       showToast(err.message || 'Failed to add evidence', 'error');
@@ -93,6 +104,8 @@ export const SkillInventoryPage: React.FC = () => {
   const openAddEvidenceModal = (skillId: string) => {
     setSelectedSkillId(skillId);
     resetEvidence();
+    setUploadedEvidence(null);
+    setEvidenceStep(1);
     setIsEvidenceModalOpen(true);
   };
 
@@ -228,18 +241,59 @@ export const SkillInventoryPage: React.FC = () => {
       {/* Add Evidence Modal */}
       <Modal isOpen={isEvidenceModalOpen} onClose={() => setIsEvidenceModalOpen(false)} title="Add Skill Evidence">
         <form onSubmit={handleEvidenceSubmit(onAddEvidence)} className="space-y-4 pt-2">
-          <Input label="Evidence Type" placeholder="e.g. Certificate, Project Repo" {...registerEvidence('evidenceType')} error={evidenceErrors.evidenceType?.message} />
-          <Input label="URL" type="url" placeholder="https://..." {...registerEvidence('evidenceUrl')} error={evidenceErrors.evidenceUrl?.message} />
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">Description</label>
-            <textarea
-              className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              {...registerEvidence('description')}
-            />
+          <div className="grid grid-cols-3 gap-2">
+            {['Upload', 'Describe', 'Submit'].map((label, index) => (
+              <div key={label} className="flex items-center gap-2">
+                <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${evidenceStep >= index + 1 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                  {index + 1}
+                </span>
+                <span className="text-xs font-medium text-gray-600">{label}</span>
+              </div>
+            ))}
           </div>
+
+          {evidenceStep === 1 && (
+            <FileUploader
+              label="Evidence file"
+              onUploadSuccess={(result) => {
+                setUploadedEvidence(result);
+                setEvidenceStep(2);
+              }}
+              onUploadError={(err: any) => showToast(err?.message || String(err), 'error')}
+            />
+          )}
+
+          {evidenceStep === 2 && (
+            <>
+              <Input label="Evidence Type" placeholder="e.g. Certificate, Project screenshot" {...registerEvidence('evidenceType')} error={evidenceErrors.evidenceType?.message} />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">Description</label>
+                <textarea
+                  className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  {...registerEvidence('description')}
+                />
+              </div>
+            </>
+          )}
+
+          {evidenceStep === 3 && uploadedEvidence && (
+            <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-900">
+              <p className="font-medium">Ready to submit</p>
+              <p className="mt-1 truncate">{uploadedEvidence.fileName}</p>
+            </div>
+          )}
+
           <div className="pt-4 flex justify-end gap-3">
             <Button variant="ghost" type="button" onClick={() => setIsEvidenceModalOpen(false)}>Cancel</Button>
-            <Button type="submit" isLoading={isEvidenceSubmitting}>Save Evidence</Button>
+            {evidenceStep > 1 && (
+              <Button variant="secondary" type="button" onClick={() => setEvidenceStep((step) => Math.max(1, step - 1))}>Back</Button>
+            )}
+            {evidenceStep === 2 && (
+              <Button type="button" onClick={() => setEvidenceStep(3)} disabled={!uploadedEvidence}>Continue</Button>
+            )}
+            {evidenceStep === 3 && (
+              <Button type="submit" isLoading={isEvidenceSubmitting} disabled={!uploadedEvidence}>Save Evidence</Button>
+            )}
           </div>
         </form>
       </Modal>

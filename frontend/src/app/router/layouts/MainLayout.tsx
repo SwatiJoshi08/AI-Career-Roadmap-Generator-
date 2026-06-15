@@ -20,7 +20,11 @@ export const MainLayout: React.FC = () => {
     refetchInterval: 60000,
   });
 
-  const unreadCount = (notificationsData as any)?.pagination?.total || 0;
+  const unreadCount =
+    (notificationsData as any)?.meta?.pagination?.total ??
+    (notificationsData as any)?.pagination?.total ??
+    (notificationsData as any)?.data?.length ??
+    0;
 
   const handleLogout = () => {
     logout();

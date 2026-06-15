@@ -14,10 +14,27 @@ export const getNotifications = async (req: Request, res: Response) => {
     const userId = req.user?.userId;
     if (!userId) return errorResponse(res, 401, 'Unauthorized');
 
-    const notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
+    const limit = Math.min(Number(req.query.limit) || 50, 100);
+    const query: any = { userId };
+
+    if (req.query.isRead !== undefined) {
+      query.isRead = String(req.query.isRead) === 'true';
+    }
+
+    const [notifications, total] = await Promise.all([
+      Notification.find(query).sort({ createdAt: -1 }).limit(limit),
+      Notification.countDocuments(query),
+    ]);
+
     return res.status(200).json({
       data: notifications,
-      meta: getMeta(req),
+      meta: {
+        ...getMeta(req),
+        pagination: {
+          total,
+          limit,
+        },
+      },
       error: null,
     });
   } catch (e) {

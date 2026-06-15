@@ -46,7 +46,13 @@ export const getDashboard = async (req: Request, res: Response) => {
       ]);
 
     return res.status(200).json({
-      data: { activeRoadmaps, skillCount, unreadNotifications, pendingMilestones },
+      data: {
+        activeRoadmaps,
+        skillCount,
+        skillsAdded: skillCount,
+        unreadNotifications,
+        pendingMilestones,
+      },
       meta: getMeta(req),
       error: null,
     });

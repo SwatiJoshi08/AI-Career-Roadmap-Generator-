@@ -75,7 +75,7 @@ export const NotificationsPage: React.FC = () => {
                     <h4 className={twMerge(clsx("text-sm font-medium", !n.isRead ? "text-gray-900" : "text-gray-600"))}>
                       {n.title}
                     </h4>
-                    <p className="text-sm text-gray-500 mt-1">{n.message}</p>
+                    <p className="text-sm text-gray-500 mt-1">{n.body || n.message}</p>
                   </div>
                   <span className="text-xs text-gray-400 whitespace-nowrap">
                     {new Date(n.createdAt).toLocaleDateString()}

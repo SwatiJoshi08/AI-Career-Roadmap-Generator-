@@ -5,10 +5,10 @@ import { roadmapApi } from '../features/acrg/api/roadmap.api';
 import { progressApi } from '../features/acrg/api/progress.api';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { Input } from '../components/ui/Input';
 import { EmptyState } from '../components/ui/EmptyState';
 import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
 import { ErrorAlert } from '../components/ui/ErrorAlert';
+import { FileUploader, type UploadedFileResult } from '../components/ui/FileUploader';
 import { useToast } from '../lib/ToastContext';
 import { Map, CheckCircle, Clock } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -17,6 +17,7 @@ import { twMerge } from 'tailwind-merge';
 export const RoadmapPage: React.FC = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loggingProgressFor, setLoggingProgressFor] = useState<string | null>(null);
+  const [progressAttachment, setProgressAttachment] = useState<UploadedFileResult | null>(null);
 
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -32,7 +33,7 @@ export const RoadmapPage: React.FC = () => {
     enabled: !!selectedId,
   });
 
-  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm();
+  const { register, handleSubmit, reset, setValue, formState: { isSubmitting } } = useForm();
 
   const handleActivate = async () => {
     if (!selectedId) return;
@@ -54,10 +55,15 @@ export const RoadmapPage: React.FC = () => {
         milestoneId: loggingProgressFor,
         note: formData.note,
         evidenceUrl: formData.evidenceUrl,
+        fileName: progressAttachment?.fileName,
+        publicId: progressAttachment?.publicId,
+        resourceType: progressAttachment?.resourceType,
+        fileSize: progressAttachment?.fileSize,
         flaggedForReview: formData.flaggedForReview,
       });
       showToast('Progress logged successfully', 'success');
       setLoggingProgressFor(null);
+      setProgressAttachment(null);
       reset();
       refetchDetail();
     } catch (err: any) {
@@ -181,17 +187,20 @@ export const RoadmapPage: React.FC = () => {
                                   required
                                 />
                               </div>
-                              <Input 
-                                {...register('evidenceUrl')} 
-                                placeholder="Evidence URL (optional)" 
-                                type="url" 
+                              <FileUploader
+                                label="Certificate or screenshot"
+                                onUploadSuccess={(result) => {
+                                  setProgressAttachment(result);
+                                  setValue('evidenceUrl', result.secureUrl);
+                                }}
+                                onUploadError={(err: any) => showToast(err?.message || String(err), 'error')}
                               />
                               <label className="flex items-center gap-2 text-sm text-gray-700">
                                 <input type="checkbox" {...register('flaggedForReview')} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                                 Request mentor review
                               </label>
                               <div className="flex justify-end gap-2 pt-2">
-                                <Button variant="ghost" size="sm" type="button" onClick={() => { setLoggingProgressFor(null); reset(); }}>Cancel</Button>
+                                <Button variant="ghost" size="sm" type="button" onClick={() => { setLoggingProgressFor(null); setProgressAttachment(null); reset(); }}>Cancel</Button>
                                 <Button size="sm" type="submit" isLoading={isSubmitting}>Submit</Button>
                               </div>
                             </form>
