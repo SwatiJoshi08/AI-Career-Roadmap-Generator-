@@ -30,6 +30,14 @@ const userSchema = new Schema<IUser>(
   }
 );
 
+userSchema.set('toJSON', {
+  transform: (_doc, ret) => {
+    delete (ret as any).passwordHash;
+    delete (ret as any).__v;
+    return ret;
+  }
+});
+
 applyBaseSchemaSetup(userSchema);
 
 export const User = mongoose.model<IUser>('User', userSchema);

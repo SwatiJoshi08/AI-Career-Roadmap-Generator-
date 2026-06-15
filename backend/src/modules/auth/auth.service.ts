@@ -72,4 +72,33 @@ export class AuthService {
       timestamp: new Date()
     });
   }
+
+  static async register(data: { email: string; password: string; role: any }): Promise<{ token: string; user: any }> {
+    const existingUser = await User.findOne({ email: data.email });
+    if (existingUser) {
+      throw new Error('Conflict');
+    }
+    const bcrypt = require('bcryptjs');
+    const passwordHash = await bcrypt.hash(data.password, 12);
+    const result = await this.registerUser(data.email, passwordHash, data.role);
+    if (result.error || !result.user) {
+      throw new Error(result.error || 'Registration failed');
+    }
+    const token = this.generateToken(result.user._id.toString(), result.user.email, result.user.role);
+    return { token, user: result.user.toJSON() };
+  }
+
+  static async login(data: { email: string; password: string }): Promise<{ token: string; user: any }> {
+    const result = await this.loginUser(data.email);
+    if (result.error || !result.user) {
+      throw new Error(result.error || 'Login failed');
+    }
+    const bcrypt = require('bcryptjs');
+    const isMatch = await bcrypt.compare(data.password, result.user.passwordHash);
+    if (!isMatch) {
+      throw new Error('Invalid credentials');
+    }
+    const token = this.generateToken(result.user._id.toString(), result.user.email, result.user.role);
+    return { token, user: result.user.toJSON() };
+  }
 }

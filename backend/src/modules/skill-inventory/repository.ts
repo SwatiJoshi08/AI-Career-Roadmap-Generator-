@@ -10,9 +10,10 @@ export class SkillRepository {
     }
 
     async findByUserIdAndName(userId: string, name: string) {
+        const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return Skill.findOne({
             userId,
-            name: { $regex: new RegExp(`^${name}$`, 'i') },
+            name: { $regex: new RegExp(`^${escapedName}$`, 'i') },
             deletedAt: null
         }).lean();
     }
