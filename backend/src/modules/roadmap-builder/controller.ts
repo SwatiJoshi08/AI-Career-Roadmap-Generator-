@@ -62,11 +62,20 @@ export const createRoadmap = async (req: Request, res: Response) => {
           title: typeof milestone === 'string' ? milestone : (milestone.title || 'Milestone'),
           description: milestone.description || '',
           orderIndex: orderIndex++,
+          resources: (phase.resources || []).map((r: any) => ({
+            url: r.url,
+            title: r.title,
+            linkStatus: 'unverified'
+          })),
           createdBy: userId,
           updatedBy: userId
         });
       }
     }
+
+    // 6. Generate explanations for roadmap skills
+    const { generateExplanationsForRoadmap } = await import('../../services/explanationService');
+    await generateExplanationsForRoadmap(roadmap._id, aiResult, gapAnalysis);
 
     const meta = getMeta(req);
     return res.status(201).json(successResponse(roadmap, meta));
@@ -107,10 +116,24 @@ export const getRoadmapById = async (req: Request, res: Response) => {
       return errorResponse(res, 403, 'Forbidden');
     }
 
-    const milestones = await RoadmapMilestone.find({ 
+    const milestonesRaw = await RoadmapMilestone.find({ 
       roadmapId: roadmap._id,
       deletedAt: null 
     }).sort({ orderIndex: 1 }).lean();
+
+    const milestones = milestonesRaw.map((m: any) => ({
+      ...m,
+      resources: m.resources?.map((r: any) => ({
+        url: r.linkStatus === 'verified' 
+             ? r.url 
+             : r.linkStatus === 'broken' 
+               ? r.fallbackUrl 
+               : r.url,
+        isFallback: r.linkStatus === 'broken',
+        linkStatus: r.linkStatus,
+        title: r.title
+      })) || []
+    }));
 
     const meta = getMeta(req);
     return res.status(200).json(successResponse({
@@ -145,6 +168,26 @@ export const activateRoadmap = async (req: Request, res: Response) => {
     });
   } catch (e) {
     console.error('activateRoadmap error:', e);
+    return errorResponse(res, 500, 'Internal server error');
+  }
+};
+
+import { RoadmapExplanation } from '../../database/models/RoadmapExplanation';
+
+export const getRoadmapExplanation = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return errorResponse(res, 401, 'Unauthorized');
+
+    const roadmapId = req.params.id;
+    const roadmap = await Roadmap.findById(roadmapId);
+    if (!roadmap) return errorResponse(res, 404, 'Roadmap not found');
+    if (roadmap.userId.toString() !== userId) return errorResponse(res, 403, 'Forbidden');
+
+    const explanations = await RoadmapExplanation.find({ roadmapId });
+    return res.status(200).json(successResponse(explanations));
+  } catch (e) {
+    console.error('getRoadmapExplanation error:', e);
     return errorResponse(res, 500, 'Internal server error');
   }
 };

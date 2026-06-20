@@ -14,6 +14,7 @@ import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
 import { ErrorAlert } from '../components/ui/ErrorAlert';
 import { useToast } from '../lib/ToastContext';
 import { Target, Edit2 } from 'lucide-react';
+import { OccupationSearch } from '../features/acrg/components/OccupationSearch';
 
 const goalSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -21,6 +22,8 @@ const goalSchema = z.object({
   targetDate: z.string().optional(),
   priority: z.enum(['low', 'medium', 'high']).optional(),
   goalType: z.string().optional(),
+  occupationCode: z.string().optional(),
+  occupationTitle: z.string().optional(),
 });
 
 type GoalFormData = z.infer<typeof goalSchema>;
@@ -43,6 +46,7 @@ export const GoalSelectionPage: React.FC = () => {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<GoalFormData>({
     resolver: zodResolver(goalSchema),
@@ -50,7 +54,7 @@ export const GoalSelectionPage: React.FC = () => {
 
   const openCreatePanel = () => {
     setEditingGoal(null);
-    reset({ title: '', description: '', targetDate: '', priority: 'medium', goalType: '' });
+    reset({ title: '', description: '', targetDate: '', priority: 'medium', goalType: '', occupationCode: '', occupationTitle: '' });
     setFormError(null);
     setIsPanelOpen(true);
   };
@@ -63,6 +67,8 @@ export const GoalSelectionPage: React.FC = () => {
       targetDate: goal.targetDate ? new Date(goal.targetDate).toISOString().split('T')[0] : '',
       priority: goal.priority || 'medium',
       goalType: goal.goalType || '',
+      occupationCode: goal.occupationCode || '',
+      occupationTitle: goal.occupationTitle || '',
     });
     setFormError(null);
     setIsPanelOpen(true);
@@ -183,6 +189,16 @@ export const GoalSelectionPage: React.FC = () => {
       >
         {formError && <div className="mb-4"><ErrorAlert message={formError} /></div>}
         
+        <div className="mb-5">
+          <OccupationSearch
+            onSelect={(occ) => {
+              setValue('title', occ.title);
+              setValue('occupationCode', occ.occupationCode);
+              setValue('occupationTitle', occ.title);
+            }}
+          />
+        </div>
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <Input
             label="Title *"

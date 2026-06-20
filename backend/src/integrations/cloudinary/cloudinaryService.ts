@@ -1,73 +1,71 @@
-import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
-import path from 'path';
+import { v2 as cloudinary } from 'cloudinary';
 import { config } from '../../config/env';
-import { ValidationError } from '../../common/errors';
 
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
-const ALLOWED_EXTENSIONS = new Set(['.pdf', '.png', '.jpg', '.jpeg']);
-
+// Initialize Cloudinary configuration
 cloudinary.config({
   cloud_name: config.CLOUDINARY_CLOUD_NAME,
   api_key: config.CLOUDINARY_API_KEY,
   api_secret: config.CLOUDINARY_API_SECRET,
 });
 
-export interface CloudinaryUploadResult {
-  publicId: string;
-  secureUrl: string;
-  fileName: string;
-  fileSize: number;
-  resourceType: string;
-}
-
-const validateFile = (buffer: Buffer, fileName: string) => {
-  const extension = path.extname(fileName).toLowerCase();
-
-  if (!ALLOWED_EXTENSIONS.has(extension)) {
-    throw new ValidationError('INVALID_FILE_TYPE');
-  }
-
-  if (buffer.length > MAX_FILE_SIZE_BYTES) {
-    throw new ValidationError('FILE_TOO_LARGE');
-  }
-};
-
+/**
+ * Upload a file buffer to Cloudinary.
+ * @param buffer - File buffer (e.g., from Multer memory storage).
+ * @param originalName - Original filename.
+ * @param folder - Destination folder within Cloudinary (e.g., 'acrg/evidence').
+ * @returns Promise resolving to relevant upload metadata.
+ */
 export const uploadFile = async (
   buffer: Buffer,
-  fileName: string,
+  originalName: string,
   folder: string
-): Promise<CloudinaryUploadResult> => {
-  validateFile(buffer, fileName);
-
-  const result = await new Promise<UploadApiResponse>((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
+): Promise<{
+  url: string;
+  publicId: string;
+  resourceType: string;
+  fileName: string;
+  fileSize: number;
+}> => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder,
+        public_id: originalName.replace(/\.[^/.]+$/, ''), // strip extension for public_id
+        filename_override: originalName,
         resource_type: 'auto',
-        use_filename: true,
-        unique_filename: true,
       },
-      (error, uploadResult) => {
-        if (error || !uploadResult) {
-          reject(error || new Error('Cloudinary upload failed'));
-          return;
+      (error: any, result: any) => {
+        if (error) {
+          return reject(new Error(`Cloudinary upload error: ${error.message}`));
         }
-        resolve(uploadResult);
+        if (!result) {
+          return reject(new Error('Cloudinary upload failed without error details'));
+        }
+        resolve({
+          url: result.secure_url,
+          publicId: result.public_id,
+          resourceType: result.resource_type,
+          fileName: result.original_filename,
+          fileSize: result.bytes,
+        });
       }
     );
-
-    stream.end(buffer);
+    uploadStream.end(buffer);
   });
-
-  return {
-    publicId: result.public_id,
-    secureUrl: result.secure_url,
-    fileName,
-    fileSize: buffer.length,
-    resourceType: result.resource_type,
-  };
 };
 
-export const deleteFile = async (publicId: string) => {
-  return cloudinary.uploader.destroy(publicId, { resource_type: 'auto' });
+/**
+ * Delete a Cloudinary resource by its public ID.
+ * @param publicId - The public ID of the resource to delete.
+ */
+export const deleteFile = async (publicId: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(publicId, { resource_type: 'image' }, (error) => {
+      if (error) {
+        return reject(new Error(`Cloudinary delete error: ${error.message}`));
+      }
+      // result can be 'ok' or 'not found', treat both as success.
+      resolve();
+    });
+  });
 };

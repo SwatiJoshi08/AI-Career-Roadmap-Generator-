@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 import { z } from 'zod';
 import { config } from '../../config/env';
 import { AiServiceError, AiOutputValidationError } from '../../common/errors';
@@ -39,8 +39,10 @@ const outputSchema = z.object({
   limitations: z.string().max(300),
 });
 
-const genAI = new GoogleGenerativeAI(config.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: config.AI_MODEL });
+const openai = new OpenAI({
+  baseURL: 'https://www.google.com/search?q=v1+api.groq.com',
+  apiKey: config.GROQ_API_KEY,
+});
 
 export const generateCareerPathway = async (input: CareerPathwayInput) => {
   // 1. Validate input
@@ -54,22 +56,30 @@ export const generateCareerPathway = async (input: CareerPathwayInput) => {
   let text = '';
 
   try {
-    // 3. Call Gemini API with 15s timeout
+    // 3. Call GROQ API with 15s timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    // Promise.race to enforce timeout if the SDK doesn't support AbortSignal natively
-    const result = await Promise.race([
-      model.generateContent(prompt),
-      new Promise<never>((_, reject) => {
-        controller.signal.addEventListener('abort', () => reject(new Error('Timeout')));
-      }),
-    ]);
+    const response = await openai.chat.completions.create(
+      {
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        response_format: { type: 'json_object' },
+      },
+      {
+        signal: controller.signal,
+      }
+    );
 
     clearTimeout(timeoutId);
-    text = result.response.text();
+    text = response.choices[0]?.message?.content || '';
   } catch (error) {
-    throw new AiServiceError(`Gemini AI execution failed: ${(error as Error).message}`, error);
+    throw new AiServiceError(`GROQ AI execution failed: ${(error as Error).message}`, error);
   }
 
   const responseTimestamp = new Date();
@@ -89,7 +99,7 @@ export const generateCareerPathway = async (input: CareerPathwayInput) => {
     // 6. Return structured output + metadata
     return {
       result: validatedOutput,
-      modelName: config.AI_MODEL,
+      modelName: 'llama-3.3-70b-versatile',
       promptVersion,
       requestTimestamp,
       responseTimestamp,

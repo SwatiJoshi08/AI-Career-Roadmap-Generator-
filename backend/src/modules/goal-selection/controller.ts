@@ -73,6 +73,8 @@ export const createGoal = async (req: Request, res: Response) => {
       targetDate: parsed.data.targetDate,
       priority: parsed.data.priority,
       goalType: parsed.data.goalType ? stripHtml(parsed.data.goalType) : undefined,
+      occupationCode: parsed.data.occupationCode ? stripHtml(parsed.data.occupationCode) : undefined,
+      occupationTitle: parsed.data.occupationTitle ? stripHtml(parsed.data.occupationTitle) : undefined,
     };
 
     const meta = getMeta(req);
@@ -110,6 +112,8 @@ export const updateGoal = async (req: Request, res: Response) => {
       priority: parsed.data.priority,
       goalType: parsed.data.goalType ? stripHtml(parsed.data.goalType) : undefined,
       status: parsed.data.status ? stripHtml(parsed.data.status) : undefined,
+      occupationCode: parsed.data.occupationCode ? stripHtml(parsed.data.occupationCode) : undefined,
+      occupationTitle: parsed.data.occupationTitle ? stripHtml(parsed.data.occupationTitle) : undefined,
     };
 
     const meta = getMeta(req);

@@ -1,0 +1,52 @@
+{
+  "15-1252.00": [
+    { "name": "Programming", "description": "Writing computer programs for various purposes.", "importance": 95 },
+    { "name": "Software Design", "description": "Creating the architecture and specifications of software systems.", "importance": 90 },
+    { "name": "Problem Solving", "description": "Identifying complex problems and reviewing related information to develop and evaluate options.", "importance": 92 }
+  ],
+  "15-2051.00": [
+    { "name": "Data Analysis", "description": "Analyzing data to extract meaningful insights.", "importance": 95 },
+    { "name": "Mathematics", "description": "Using mathematics to solve scientific and engineering problems.", "importance": 88 },
+    { "name": "Machine Learning", "description": "Developing and training statistical algorithms.", "importance": 92 }
+  ],
+  "15-1254.00": [
+    { "name": "Web Programming", "description": "Writing code for websites and web interfaces.", "importance": 94 },
+    { "name": "User Interface Design", "description": "Designing how users interact with web pages.", "importance": 85 },
+    { "name": "Troubleshooting", "description": "Determining causes of operating errors and deciding what to do about it.", "importance": 80 }
+  ],
+  "15-1141.00": [
+    { "name": "Systems Analysis", "description": "Determining how a system should work and how changes in conditions, operations, and the environment will affect outcomes.", "importance": 85 },
+    { "name": "Critical Thinking", "description": "Using logic and reasoning to identify the strengths and weaknesses of alternative solutions.", "importance": 80 },
+    { "name": "Database Management", "description": "Optimizing database configuration, query performance, and scaling.", "importance": 95 }
+  ],
+  "15-1241.00": [
+    { "name": "Network Routing", "description": "Configuring network switches and routing protocols.", "importance": 90 },
+    { "name": "Systems Evaluation", "description": "Identifying measures or indicators of system performance.", "importance": 80 },
+    { "name": "Operations Analysis", "description": "Analyzing needs and product requirements to create a design.", "importance": 82 }
+  ],
+  "15-1212.00": [
+    { "name": "Security Analysis", "description": "Monitoring and analyzing security threats.", "importance": 95 },
+    { "name": "Active Learning", "description": "Understanding the implications of new information for both current and future problem-solving.", "importance": 85 },
+    { "name": "Vulnerability Testing", "description": "Testing system infrastructure to discover security flaws.", "importance": 90 }
+  ],
+  "15-1244.00": [
+    { "name": "Automation", "description": "Creating scripts and deployment workflows to automate operations.", "importance": 95 },
+    { "name": "Systems Monitoring", "description": "Monitoring server and application metrics for reliability.", "importance": 90 },
+    { "name": "Programming", "description": "Writing code in python, bash, or go.", "importance": 85 }
+  ],
+  "27-1021.00": [
+    { "name": "Visual Design", "description": "Creating pleasing aesthetics and layouts.", "importance": 95 },
+    { "name": "User Research", "description": "Conducting surveys and user interviews to define requirements.", "importance": 88 },
+    { "name": "Prototyping", "description": "Building interactive wireframes and mockups.", "importance": 90 }
+  ],
+  "11-9199.01": [
+    { "name": "Product Strategy", "description": "Defining the product vision and strategic direction.", "importance": 95 },
+    { "name": "Coordination", "description": "Adjusting actions in relation to others' actions.", "importance": 90 },
+    { "name": "Active Listening", "description": "Giving full attention to what other people are saying.", "importance": 85 }
+  ],
+  "15-2099.01": [
+    { "name": "Machine Learning", "description": "Implementing and fine-tuning ML models.", "importance": 96 },
+    { "name": "Programming", "description": "Writing performance-oriented Python and C++ code.", "importance": 92 },
+    { "name": "Mathematical Reasoning", "description": "Applying calculus, linear algebra, and probability concepts.", "importance": 90 }
+  ]
+}

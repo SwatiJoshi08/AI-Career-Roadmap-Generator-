@@ -9,6 +9,8 @@ export interface ICareerGoal extends IBaseDocument {
   targetDate?: Date;
   priority?: GoalPriority;
   goalType?: string;
+  occupationCode?: string;
+  occupationTitle?: string;
 }
 
 const careerGoalSchema = new Schema<ICareerGoal>(
@@ -20,6 +22,8 @@ const careerGoalSchema = new Schema<ICareerGoal>(
     targetDate: { type: Date },
     priority: { type: String, enum: Object.values(GoalPriority) },
     goalType: { type: String },
+    occupationCode: { type: String },
+    occupationTitle: { type: String },
   },
   { timestamps: true }
 );

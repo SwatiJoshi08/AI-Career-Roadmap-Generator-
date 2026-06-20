@@ -9,6 +9,11 @@ export interface IRoadmap extends IBaseDocument {
   estimatedDuration?: number; // weeks
   completionPercentage: number;
   activatedAt?: Date;
+  sourceReferences?: Array<{
+    sourceType: string;
+    sourceId: string;
+    title: string;
+  }>;
 }
 
 const roadmapSchema = new Schema<IRoadmap>(
@@ -21,6 +26,13 @@ const roadmapSchema = new Schema<IRoadmap>(
     estimatedDuration: { type: Number },
     completionPercentage: { type: Number, default: 0 },
     activatedAt: { type: Date },
+    sourceReferences: [
+      {
+        sourceType: { type: String },
+        sourceId: { type: String },
+        title: { type: String },
+      }
+    ],
   },
   { timestamps: true }
 );

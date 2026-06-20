@@ -178,3 +178,46 @@ export const exportReport = async (req: Request, res: Response) => {
     return errorResponse(res, 500, 'Internal server error');
   }
 };
+
+import { OnetOccupation } from '../../database/models/OnetOccupation';
+import { embeddingQueue } from '../../jobs/queue';
+
+/* POST /admin/rebuild-embeddings */
+export const rebuildEmbeddings = async (req: Request, res: Response) => {
+  try {
+    const occupations = await OnetOccupation.find({}, { _id: 1 });
+    
+    const jobs = occupations.map(occ => ({
+      name: 'generate-embedding',
+      data: { occupationId: occ._id.toString() }
+    }));
+
+    await embeddingQueue.addBulk(jobs);
+
+    return res.status(200).json({
+      data: { message: `Queued ${jobs.length} embedding jobs.` },
+      meta: getMeta(req),
+      error: null,
+    });
+  } catch (e) {
+    console.error('rebuildEmbeddings error:', e);
+    return errorResponse(res, 500, 'Internal server error');
+  }
+};
+
+/* GET /admin/broken-links */
+export const getBrokenLinks = async (req: Request, res: Response) => {
+  try {
+    const broken = await RoadmapMilestone.find({
+      'resources.linkStatus': 'broken',
+    }).select('resources');
+    return res.status(200).json({
+      data: { broken },
+      meta: getMeta(req),
+      error: null,
+    });
+  } catch (e) {
+    console.error('getBrokenLinks error:', e);
+    return errorResponse(res, 500, 'Internal server error');
+  }
+};
