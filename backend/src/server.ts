@@ -4,10 +4,16 @@ import { connectDB } from './config/db';
 import { redis } from './config/redis';
 import mongoose from 'mongoose';
 import './jobs/gapAnalysisWorker';
+import { startEmbeddingWorker } from './jobs/embeddingWorker';
+
 const startServer = async () => {
   try {
     // Connect to database
     await connectDB();
+
+    // Start workers
+    const embeddingWorker = startEmbeddingWorker();
+    require('./jobs/linkHealthWorker');
 
     // Start listening
     const server = app.listen(config.PORT, () => {
@@ -20,6 +26,9 @@ const startServer = async () => {
       server.close(async () => {
         console.log('HTTP server closed.');
         try {
+          await embeddingWorker.close();
+          const { linkHealthWorker } = require('./jobs/linkHealthWorker');
+          if (linkHealthWorker) await linkHealthWorker.close();
           await redis.quit();
           console.log('Redis connection closed.');
           await mongoose.connection.close();

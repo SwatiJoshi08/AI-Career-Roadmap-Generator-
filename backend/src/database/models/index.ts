@@ -13,3 +13,6 @@ export * from './MentorComment';
 export * from './Notification';
 export * from './AuditLog';
 export * from './AnalyticsEvent';
+export * from './OnetOccupation';
+export * from './CareerKnowledgeChunk';
+export * from './RoadmapExplanation';

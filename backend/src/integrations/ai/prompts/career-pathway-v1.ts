@@ -5,11 +5,15 @@ export interface CareerPathwayInput {
   identifiedGaps: string[];
   availableHoursPerWeek: number;
   targetDate: string;
+  retrievedContext?: string;
 }
 
 export const buildPrompt = (input: CareerPathwayInput): string => {
-  return `Act as a career planning assistant.
+  return `${input.retrievedContext || ''}
+Act as a career planning assistant.
 Use ONLY the provided data — no external assumptions.
+When listing resources, ONLY use URLs and titles that appear in the RETRIEVED CAREER KNOWLEDGE below.
+If no resource is available for a skill, use an empty array for the resources field.
 Return ONLY valid JSON, no markdown, no explanation, no preamble, no backticks, no \`\`\`json blocks.
 Match this exact output schema:
 {

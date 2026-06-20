@@ -19,7 +19,12 @@ const roadmapMilestoneSchema = new Schema<IRoadmapMilestone>(
     description: { type: String },
     dueDate: { type: Date },
     completedAt: { type: Date },
-    resources: [{ type: String }],
+    resources: [{
+      url: { type: String, required: true },
+      linkStatus: { type: String, enum: ['unverified', 'verified', 'broken'], default: 'unverified' },
+      lastCheckedAt: { type: Date, default: null },
+      fallbackUrl: { type: String, default: null }
+    }],
     orderIndex: { type: Number },
   },
   { timestamps: true }

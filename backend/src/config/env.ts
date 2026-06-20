@@ -30,10 +30,10 @@ const envSchema = z.object({
   CLOUDINARY_API_SECRET: z.string({
     required_error: 'CLOUDINARY_API_SECRET is required',
   }),
-  GEMINI_API_KEY: z.string({
-    required_error: 'GEMINI_API_KEY is required',
+  GROQ_API_KEY: z.string({
+    required_error: 'GROQ_API_KEY is required',
   }),
-  AI_MODEL: z.string().default('gemini-1.5-pro'),
+  AI_MODEL: z.string().default('GROQ'),
   APP_ORIGIN: z.string({
     required_error: 'APP_ORIGIN is required',
   }),

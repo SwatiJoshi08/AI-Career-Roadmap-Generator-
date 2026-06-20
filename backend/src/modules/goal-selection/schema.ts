@@ -7,6 +7,8 @@ export const createGoalSchema = z.object({
   targetDate: z.coerce.date().optional(),
   priority: z.nativeEnum(GoalPriority).optional(),
   goalType: z.string().optional(),
+  occupationCode: z.string().optional(),
+  occupationTitle: z.string().optional(),
 });
 
 export const updateGoalSchema = z.object({
@@ -15,5 +17,7 @@ export const updateGoalSchema = z.object({
   targetDate: z.coerce.date().optional(),
   priority: z.nativeEnum(GoalPriority).optional(),
   goalType: z.string().optional(),
-  status: z.string().optional(), // Adding status since it's common for goal tracking, though in baseSchema it might be there.
+  status: z.string().optional(),
+  occupationCode: z.string().optional(),
+  occupationTitle: z.string().optional(),
 });

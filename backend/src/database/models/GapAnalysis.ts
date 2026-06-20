@@ -15,6 +15,8 @@ export interface IGapAnalysis extends IBaseDocument {
   promptVersion?: string;
   requestTimestamp?: Date;
   responseTimestamp?: Date;
+  retrievedDocuments?: string[];
+  retrievalScores?: number[];
 }
 
 const gapAnalysisSchema = new Schema<IGapAnalysis>(
@@ -38,6 +40,8 @@ const gapAnalysisSchema = new Schema<IGapAnalysis>(
     promptVersion: { type: String },
     requestTimestamp: { type: Date },
     responseTimestamp: { type: Date },
+    retrievedDocuments: [{ type: String }],
+    retrievalScores: [{ type: Number }],
   },
   { timestamps: true }
 );

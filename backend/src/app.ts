@@ -17,6 +17,20 @@ import mentorRoutes from './modules/mentor-review/routes';
 import notificationRoutes from './modules/notifications/routes';
 import dashboardRoutes from './modules/admin/routes';
 import uploadRoutes from './modules/upload/routes';
+import onetRoutes from './modules/onet/onet.routes';
+import { linkHealthQueue } from './jobs/queue';
+
+// Schedule repeatable weekly job (Sunday 03:00)
+(async () => {
+  await linkHealthQueue.add(
+    'weekly-health-check',
+    {}, // no payload
+    {
+      repeat: { pattern: '0 3 * * 0' }, // cron syntax
+      removeOnComplete: true,
+    }
+  );
+})();
 
 const app = express();
 
@@ -68,6 +82,7 @@ app.use('/api/v1/acrg', mentorRoutes);
 app.use('/api/v1/acrg', notificationRoutes);
 app.use('/api/v1/acrg', dashboardRoutes);
 app.use('/api/v1/acrg', uploadRoutes);
+app.use('/api/v1/acrg', onetRoutes);
 // ✅ Career Profile Routes
 app.use('/api/v1/acrg', careerProfileRoutes);
 // ✅ Career Goal Routes (now after specific routes)

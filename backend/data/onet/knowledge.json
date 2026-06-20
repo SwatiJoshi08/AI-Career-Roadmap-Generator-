@@ -1,0 +1,52 @@
+{
+  "15-1252.00": [
+    { "name": "Computers and Electronics", "description": "Knowledge of circuit boards, processors, chips, electronic equipment, and computer hardware and software, including applications and programming.", "importance": 95 },
+    { "name": "Mathematics", "description": "Knowledge of arithmetic, algebra, geometry, calculus, statistics, and their applications.", "importance": 85 },
+    { "name": "English Language", "description": "Knowledge of the structure and content of the English language including the meaning and spelling of words, rules of composition, and grammar.", "importance": 75 }
+  ],
+  "15-2051.00": [
+    { "name": "Mathematics", "description": "Knowledge of arithmetic, algebra, geometry, calculus, statistics, and their applications.", "importance": 96 },
+    { "name": "Computers and Electronics", "description": "Knowledge of database systems, algorithms, hardware and software.", "importance": 90 },
+    { "name": "Engineering and Technology", "description": "Knowledge of the practical application of engineering science and technology.", "importance": 80 }
+  ],
+  "15-1254.00": [
+    { "name": "Computers and Electronics", "description": "Knowledge of web browsers, servers, HTML, CSS, JavaScript, and other web components.", "importance": 95 },
+    { "name": "Design", "description": "Knowledge of design techniques, tools, and principles involved in production of precision technical plans, blueprints, drawings, and models.", "importance": 85 },
+    { "name": "Communications and Media", "description": "Knowledge of media production, communication, and dissemination techniques and methods.", "importance": 70 }
+  ],
+  "15-1141.00": [
+    { "name": "Computers and Electronics", "description": "Knowledge of database technologies, security structures, server configurations.", "importance": 95 },
+    { "name": "Mathematics", "description": "Knowledge of set theory, logic, relational algebra.", "importance": 75 },
+    { "name": "Administration and Management", "description": "Knowledge of business and management principles involved in strategic planning and resource allocation.", "importance": 70 }
+  ],
+  "15-1241.00": [
+    { "name": "Telecommunications", "description": "Knowledge of transmission, broadcasting, switching, control, and operation of telecommunications systems.", "importance": 95 },
+    { "name": "Computers and Electronics", "description": "Knowledge of network operating systems, routing tables, network topology.", "importance": 92 },
+    { "name": "Engineering and Technology", "description": "Knowledge of the practical application of engineering science and technology.", "importance": 85 }
+  ],
+  "15-1212.00": [
+    { "name": "Computers and Electronics", "description": "Knowledge of network security software, firewalls, and encryption algorithms.", "importance": 95 },
+    { "name": "Law and Government", "description": "Knowledge of laws, legal codes, court procedures, precedents, government regulations, executive orders, agency rules.", "importance": 80 },
+    { "name": "Engineering and Technology", "description": "Knowledge of system engineering principles and technologies.", "importance": 85 }
+  ],
+  "15-1244.00": [
+    { "name": "Computers and Electronics", "description": "Knowledge of operating systems, cloud platforms, network protocols.", "importance": 95 },
+    { "name": "Engineering and Technology", "description": "Knowledge of configuration management, build tools, continuous integration systems.", "importance": 92 },
+    { "name": "Mathematics", "description": "Knowledge of probability, statistics, algorithms.", "importance": 75 }
+  ],
+  "27-1021.00": [
+    { "name": "Design", "description": "Knowledge of design techniques, tools, and principles involved in production of precision technical plans, blueprints, drawings, and models.", "importance": 96 },
+    { "name": "Computers and Electronics", "description": "Knowledge of design software, front-end code capabilities, layout editors.", "importance": 80 },
+    { "name": "Psychology", "description": "Knowledge of human behavior and performance; individual differences in ability, personality, and interests; learning and motivation.", "importance": 85 }
+  ],
+  "11-9199.01": [
+    { "name": "Administration and Management", "description": "Knowledge of business and management principles involved in strategic planning, resource allocation, human resources modeling, leadership technique, production methods, and coordination of people and resources.", "importance": 95 },
+    { "name": "Customer and Personal Service", "description": "Knowledge of principles and processes for providing customer and personal services. This includes customer needs assessment, meeting quality standards for services, and evaluation of customer satisfaction.", "importance": 90 },
+    { "name": "Computers and Electronics", "description": "Knowledge of software engineering workflows, product requirements, data collection.", "importance": 80 }
+  ],
+  "15-2099.01": [
+    { "name": "Mathematics", "description": "Knowledge of algebra, calculus, statistics, probabilities.", "importance": 95 },
+    { "name": "Computers and Electronics", "description": "Knowledge of AI models, neural networks, machine learning libraries, distributed training infrastructure.", "importance": 95 },
+    { "name": "Engineering and Technology", "description": "Knowledge of deploying AI pipelines, model optimization, tensor processing.", "importance": 90 }
+  ]
+}
